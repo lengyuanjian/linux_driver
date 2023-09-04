@@ -7,37 +7,22 @@
 #include <linux/skbuff.h>
 #include <linux/ip.h>
 #include <linux/tcp.h>
+
+#include "to_string.h"
+
 static struct nf_hook_ops nfho;
+static char buff[2048]={};
+static char str_buf[2048] = {};
 #define str_to_ip(a, b, c, d) htonl((a << 24) | (b << 16) | (c << 8) | d)
-static void to_string(struct iphdr head) {
-    printk(KERN_INFO
-           "Version: %d\n"
-           "IHL: %d\n"
-           "TOS: %d\n"
-           "Total Length: %d\n"
-           "ID: %d\n"
-           "Fragment Offset: 0x%04x\n"
-           "TTL: %d\n"
-           "Protocol: %d\n"
-           "Checksum: 0x%04X\n"
-           "Source IP: %u.%u.%u.%u\n"
-           "Destination IP: %u.%u.%u.%u\n",
-           head.version,
-           head.ihl,
-           head.tos,
-           ntohs(head.tot_len),
-           ntohs(head.id),
-           ntohs(head.frag_off),
-           //head.frag_off ,
-           head.ttl,
-           head.protocol,
-           ntohs(head.check),
-            head.saddr & 0xFF, (head.saddr >> 8) & 0xFF,(head.saddr >> 16) & 0xFF,(head.saddr >> 24) & 0xFF,
-            head.daddr & 0xFF,(head.daddr >> 8) & 0xFF,(head.daddr >> 16) & 0xFF,(head.daddr >> 24) & 0xFF );
+static void to_string(struct iphdr head) 
+{
+    char buff[1024] = {};
+    ip_to_string(buff, 2048,&head);
+    printk(KERN_INFO "strings ip: %s\n", buff);
 }
 static void tcp_hdr_to_string(const struct tcphdr *tcp) {
-    printk(KERN_INFO
-           "Source Port: %u\n"
+    
+    snprintf(buff,2048,"-Source Port: %u\n"
            "Destination Port: %u\n"
            "Sequence Number: %u\n"
            "Acknowledgment Number: %u\n"
@@ -60,16 +45,26 @@ static void tcp_hdr_to_string(const struct tcphdr *tcp) {
            ntohs(tcp->window),
            ntohs(tcp->check),
            ntohs(tcp->urg_ptr));
+           printk(KERN_INFO "%s\n", buff);
 }
 
-static unsigned int capture_packet(void *priv, struct sk_buff *skb, const struct nf_hook_state *state)
+static unsigned int capture_packet(const struct nf_hook_ops *ops,
+			       struct sk_buff *skb,
+			       const struct net_device *in,
+			       const struct net_device *out,
+#ifndef __GENKSYMS__
+			       const struct nf_hook_state *state
+#else
+			       int (*okfn)(struct sk_buff *)
+#endif
+			       )
 {
     struct iphdr *ip_header;
     struct tcphdr* tcp_header;
     static int cout=0;
     int tcp_data_len = 0;
     int i = 0;
-    char str_buf[2048] = {};
+    
     /* Check if the packet is an IP packet */
     if (skb->protocol == htons(ETH_P_IP) ) {
         /* Get a pointer to the IP header */
@@ -77,7 +72,7 @@ static unsigned int capture_packet(void *priv, struct sk_buff *skb, const struct
         if(ip_header->protocol == 6)
         {
             tcp_header = (struct tcphdr*)skb_transport_header(skb);
-            if(ntohs(tcp_header->source) == 12345 || ntohs(tcp_header->dest) == 12345)
+            //if(ntohs(tcp_header->source) == 12345 || ntohs(tcp_header->dest) == 12345)
             {
                 printk(KERN_INFO "****seq:%d************\n", cout++);
                 printk(KERN_INFO "Captured packet: %pI4 -> %pI4  len:%d\n", 
