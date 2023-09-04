@@ -1,0 +1,16 @@
+{
+    "configurations": [
+      {
+        "name": "lengyuanjian",
+        "includePath": [
+          "${workspaceFolder}/**"
+        ],
+        "defines": [
+          "DEBUG", // 添加宏定义 DEBUG
+          "CONFIG_NETFILTER" // 添加宏定义 MY_MACRO，并设置其值为 42
+        ]        
+      }
+    ],
+    "version": 4
+  }
+  
