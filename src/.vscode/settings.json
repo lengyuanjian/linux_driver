@@ -1,5 +1,15 @@
 {
     "files.associations": {
-        "kernel.h": "c"
-    }
+        "kernel.h": "c",
+        "tcp.h": "c",
+        "ip.h": "c",
+        "skbuff.h": "c",
+        "netfilter_ipv4.h": "c",
+        "netfilter.h": "c",
+        "net.h": "c",
+        "if_ether.h": "c",
+        "udp.h": "c",
+        "to_string.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }

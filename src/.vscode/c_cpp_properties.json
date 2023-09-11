@@ -3,7 +3,8 @@
       {
         "name": "lengyuanjian",
         "includePath": [
-          "${workspaceFolder}/**"
+          "${workspaceFolder}/**",
+          "${workspaceFolder}/3.10/include"
         ],
         "defines": [
           "DEBUG", // 添加宏定义 DEBUG
