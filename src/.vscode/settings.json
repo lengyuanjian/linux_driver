@@ -9,7 +9,8 @@
         "net.h": "c",
         "if_ether.h": "c",
         "udp.h": "c",
-        "to_string.h": "c"
+        "to_string.h": "c",
+        "init.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
