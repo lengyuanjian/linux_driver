@@ -2,7 +2,7 @@ MY_DRIVER_NAME=lyj_netfilter_cache
 
 obj-m += $(MY_DRIVER_NAME).o
 
-$(MY_DRIVER_NAME)-objs := netfilter_cache.o to_string.o
+$(MY_DRIVER_NAME)-objs := netfilter_cache.o to_string.o fifo_queue.o
 
 KDIR := /lib/modules/$(shell uname -r)/build
 PWD := $(shell pwd)
