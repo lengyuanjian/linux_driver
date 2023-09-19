@@ -16,6 +16,7 @@ static struct nf_hook_ops nfho_local_in;
 static struct nf_hook_ops nfho_forward;
 static struct nf_hook_ops nfho_local_out;
 static struct nf_hook_ops nfho_post_routing;
+
 static char str_buf[2048] = {};
 
 #define str_to_ip(a, b, c, d) htonl((a << 24) | (b << 16) | (c << 8) | d)
