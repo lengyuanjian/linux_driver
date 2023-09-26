@@ -55,7 +55,7 @@ struct sh_circular_queue * sh_queue_create(int node_count)
 int sh_queue_is_full(struct sh_circular_queue * p_queue)
 {
     int next_w = (p_queue->w + 1) % p_queue->node_count;
-    if(next_w == p_queue->w)
+    if(next_w == p_queue->r)
     {
         return 0;
     }
