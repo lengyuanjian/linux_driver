@@ -1,8 +1,11 @@
-MY_DRIVER_NAME=lgz_netfilter
+MY_DRIVER_NAME=lgz_ch
 
 obj-m += $(MY_DRIVER_NAME).o
 
-$(MY_DRIVER_NAME)-objs := lyj_netfilter.o to_string.o
+SOURCES:=$(wildcard *.c)
+OBJ:=$(patsubst %.c, %.o, $(SOURCES))
+
+$(MY_DRIVER_NAME)-objs := lyj_ch.o
 
 KDIR := /lib/modules/$(shell uname -r)/build
 PWD := $(shell pwd)

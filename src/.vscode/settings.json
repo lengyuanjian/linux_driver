@@ -12,7 +12,8 @@
         "to_string.h": "c",
         "init.h": "c",
         "types.h": "c",
-        "module.h": "c"
+        "module.h": "c",
+        "mutex.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
