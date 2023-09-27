@@ -40,8 +40,11 @@ static int my_thread_func(void *data)
             rule_rule = rule_rule->next;
         }
         mutex_unlock(&open_mutex);
-        printk(KERN_INFO "%s\n",buf);
-        msleep(3000);
+        if(i > 0)
+        {
+            printk(KERN_INFO "%s\n",buf);
+        }
+        msleep(1000);
     }
     return 0;
 }
@@ -64,7 +67,7 @@ static int char_device_open(struct inode *inode, struct file *file)
     rule_rule->next = rule;
     rule->prev = rule_rule;
     rule->next= NULL;
-    printk(KERN_INFO "lyj function: %s rule_id[%d] prev[%x] next[%x]\n", __func__, rule->id, rule_rule,rule);
+    printk(KERN_INFO "lyj function: %s rule_id[%d] prev[%x] rule[%x]\n", __func__, rule->id, rule_rule,rule);
     mutex_unlock(&open_mutex);
     return 0;
 }
@@ -76,10 +79,13 @@ static int char_device_release(struct inode *inode, struct file *file)
     rule =(struct sh_rule *)file->private_data;
     if(rule)
     {   
-        printk(KERN_INFO "lyj function: %s rule_id[%d] prev[%x] next[%x]\n", __func__, rule->id, rule->prev->next ,rule->next);
+        printk(KERN_INFO "lyj function: %s rule_id[%d] prev[%x] rule[%x] next[%x]\n", __func__, rule->id, rule->prev ,rule ,rule->next);
         rule->prev->next = rule->next;
-         
-        rule->next = NULL;
+        if(rule->next)
+        {
+            rule->next->prev =  rule->prev;
+        }
+        //rule->next = NULL;
         kfree(rule);
     }
     file->private_data = NULL;
