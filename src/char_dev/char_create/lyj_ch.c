@@ -30,14 +30,16 @@ static int my_thread_func(void *data)
      {
         // 在这里执行内核线程的工作
         // 例如，处理系统级任务或驱动程序工作
-        rule_rule = rule_head.next;
         memset(buf,0, sizeof(buf));
         i = 0;
+        mutex_lock(&open_mutex);
+        rule_rule = rule_head.next;
         while(rule_rule)
         {
             i += snprintf(buf + i, sizeof(buf) - i, "id[%d] ", rule_rule->id);
             rule_rule = rule_rule->next;
         }
+        mutex_unlock(&open_mutex);
         printk(KERN_INFO "%s\n",buf);
         msleep(3000);
     }
@@ -61,20 +63,23 @@ static int char_device_open(struct inode *inode, struct file *file)
     }
     rule_rule->next = rule;
     rule->prev = rule_rule;
-    printk(KERN_INFO "lyj function: %s\n", __func__);
+    rule->next= NULL;
+    printk(KERN_INFO "lyj function: %s rule_id[%d] prev[%x] next[%x]\n", __func__, rule->id, rule_rule,rule);
     mutex_unlock(&open_mutex);
     return 0;
 }
 
 static int char_device_release(struct inode *inode, struct file *file)
 {
+    struct sh_rule * rule;
     mutex_lock(&open_mutex);
-    struct sh_rule * rule =(struct sh_rule *)file->private_data;
+    rule =(struct sh_rule *)file->private_data;
     if(rule)
     {   
-        printk(KERN_INFO "lyj function: %s rule_id[%d]\n", __func__, rule->id);
+        printk(KERN_INFO "lyj function: %s rule_id[%d] prev[%x] next[%x]\n", __func__, rule->id, rule->prev->next ,rule->next);
         rule->prev->next = rule->next;
-
+         
+        rule->next = NULL;
         kfree(rule);
     }
     file->private_data = NULL;
@@ -146,6 +151,8 @@ static int __init char_device_init(void)
         printk(KERN_INFO "device_create failed. major[%d] class name[%s] driver name[%s]\n", major, class_name, driver_name);
         return PTR_ERR(device_node);
     }
+    rule_head.next = NULL;
+    rule_head.prev = NULL;
     // 创建内核线程
     my_thread = kthread_run(my_thread_func, NULL, "my_thread");
     if (IS_ERR(my_thread)) 
